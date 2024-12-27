@@ -1,0 +1,55 @@
+# version: '3.9'
+
+services:
+  scrapy:
+    build: .
+    container_name: scraper
+    # command: ["scrapy", "crawl", "hotels_combined"]
+    volumes:
+      - .:/app
+    depends_on:
+      - db
+    environment:
+      - DATABASE_URL=postgresql+psycopg2://myuser:mypassword@db:5432/hotel_db
+
+  db:
+    image: postgres:latest
+    container_name: scraped_db
+    restart: always
+    environment:
+      POSTGRES_USER: myuser
+      POSTGRES_PASSWORD: mypassword
+      POSTGRES_DB: hotel_db
+    volumes:
+      - db_data:/var/lib/postgresql/data
+
+  # tests:
+  #   build: .
+  #   container_name: hotel_scraper_tests
+  #   command: ["coverage", "run", "-m", "unittest", "discover", "tests"]
+  #   volumes:
+  #     - .:/app
+  #   depends_on:
+  #     - db
+  #   environment:
+  #     - DATABASE_URL=postgresql://myuser:mypassword@db:5432/hotel_db
+  django:
+    build:
+      context: .
+    # user: "${UID}:${GID}"
+    command: python manage.py runserver 0.0.0.0:8000
+    volumes:
+      - .:/app
+    ports:
+      - "8000:8000"
+    depends_on:
+      - db
+    environment:
+      DJANGO_SETTINGS_MODULE: llm_handler.core.settings
+      DB_HOST: scraped_db
+      DB_NAME: hotel_db
+      DB_USER: myuser
+      DB_PASSWORD: mypassword
+
+volumes:
+  db_data:
