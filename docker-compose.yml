@@ -1,17 +1,6 @@
 # version: '3.9'
 
 services:
-  scrapy:
-    build: .
-    container_name: scraper
-    # command: ["scrapy", "crawl", "hotels_combined"]
-    volumes:
-      - .:/app
-    depends_on:
-      - db
-    environment:
-      - DATABASE_URL=postgresql+psycopg2://myuser:mypassword@db:5432/hotel_db
-
   db:
     image: postgres:latest
     container_name: scraped_db
@@ -22,34 +11,55 @@ services:
       POSTGRES_DB: hotel_db
     volumes:
       - db_data:/var/lib/postgresql/data
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U myuser -d hotel_db"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
 
-  # tests:
-  #   build: .
-  #   container_name: hotel_scraper_tests
-  #   command: ["coverage", "run", "-m", "unittest", "discover", "tests"]
-  #   volumes:
-  #     - .:/app
-  #   depends_on:
-  #     - db
-  #   environment:
-  #     - DATABASE_URL=postgresql://myuser:mypassword@db:5432/hotel_db
+  scrapy:
+    build:
+      context: .
+      args:
+        SERVICE: "scrapy crawl hotels_combined"
+    container_name: scraper
+    depends_on:
+      db:
+        condition: service_healthy
+    volumes:
+      - .:/app
+    environment:
+      - DATABASE_URL=postgresql+psycopg2://myuser:mypassword@db:5432/hotel_db
+
   django:
     build:
       context: .
-    # user: "${UID}:${GID}"
-    command: python manage.py runserver 0.0.0.0:8000
+      args:
+        SERVICE: "python manage.py runserver 0.0.0.0:8000"
+    container_name: property_rewriter
+    depends_on:
+      db:
+        condition: service_healthy
     volumes:
       - .:/app
     ports:
       - "8000:8000"
-    depends_on:
-      - db
     environment:
       DJANGO_SETTINGS_MODULE: llm_handler.core.settings
       DB_HOST: scraped_db
       DB_NAME: hotel_db
       DB_USER: myuser
       DB_PASSWORD: mypassword
+
+  ollama:
+    image: ollama/ollama:latest
+    container_name: ollama
+    ports:
+      - "11434:11434"
+    volumes:
+      - ./ollama:/root/.ollama
+    restart: unless-stopped
+    command: serve
 
 volumes:
   db_data:
