@@ -77,11 +77,11 @@ WSGI_APPLICATION = 'core.wsgi.application'
 
 DATABASES = {
     'default': {
-        'ENGINE': 'django.contrib.gis.db.backends.postgis',
-        'NAME': 'inventory_db',
+        'ENGINE': 'django.db.backends.postgresql',
+        'NAME': 'hotel_db',
         'USER': 'myuser',
         'PASSWORD': 'mypassword',
-        'HOST': 'hotel_db',
+        'HOST': 'db',
         'PORT': '5432',
     }
 }

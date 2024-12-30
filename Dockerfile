@@ -28,5 +28,5 @@ COPY . /app/
 EXPOSE 8000
 
 # Use an argument to determine the command to run
-ARG SERVICE
-CMD ["sh", "-c", "$SERVICE"]
+# ARG SERVICE
+# CMD ["sh", "-c", "$SERVICE"]

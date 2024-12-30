@@ -31,6 +31,7 @@ class HotelsSpider(scrapy.Spider):
 
             for city in selected_cities:
                 location_id = city.get("id")
+                print(location_id)
                 url = f"https://uk.trip.com/hotels/list?city={location_id}"
                 yield scrapy.Request(
                     url=url,
@@ -71,7 +72,7 @@ class HotelsSpider(scrapy.Spider):
                 if not hotel_data["image_url"]:
                     self.logger.warning(f"Skipping hotel due to missing image: {hotel_data['property_title']}")
                     continue
-
+                # print(hotel_data)
                 yield hotel_data
         else:
             self.logger.warning(f"No hotel data found for {city_name}")

@@ -100,7 +100,7 @@ FEED_EXPORT_ENCODING = "utf-8"
 
 LOG_FILE = "hotels.log"          # Log file name
 LOG_LEVEL = "INFO"               # Log level: DEBUG, INFO, WARNING, ERROR, CRITICAL
-LOG_STDOUT = True                # Redirect stdout to log file (useful for print statements)
+# LOG_STDOUT = True                # Redirect stdout to log file (useful for print statements)
 
 # FEED_FORMAT = 'json'
 # FEED_URI = 'output/random_3_hotels.json'

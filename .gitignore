@@ -41,3 +41,7 @@ venv.bak/
 # Windows
 Thumbs.db
 ehthumbs.db
+
+# ignore images scraped by scrapy
+images/
+ollama/

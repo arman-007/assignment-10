@@ -6,7 +6,7 @@ import os
 import scrapy
 
 class HotelsPipeline(ImagesPipeline):
-
+    print("DB url is ", os.getenv("DATABASE_URL"))
     def get_media_requests(self, item, spider):
         # Download the image
         yield scrapy.Request(item["image_url"], meta={"item": item})
@@ -37,6 +37,7 @@ class HotelsPipeline(ImagesPipeline):
             "port": result.port,
         }
         try:
+            print(db_params)
             conn = psycopg2.connect(**db_params)
             cursor = conn.cursor()
 
