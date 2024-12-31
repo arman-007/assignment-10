@@ -17,6 +17,7 @@ services:
       timeout: 5s
       retries: 5
 
+
   scrapy:
     build: .
       # context: .
@@ -32,6 +33,7 @@ services:
       - .:/app
     environment:
       - DATABASE_URL=postgresql+psycopg2://myuser:mypassword@db:5432/hotel_db
+
 
   django:
     build: .
@@ -54,6 +56,8 @@ services:
       DB_NAME: hotel_db
       DB_USER: myuser
       DB_PASSWORD: mypassword
+      OLLAMA_URL: http://ollama:11434
+
 
   ollama:
     image: ollama/ollama:latest
@@ -64,6 +68,7 @@ services:
       - ./ollama:/root/.ollama
     restart: unless-stopped
     command: serve
+
 
 volumes:
   db_data:

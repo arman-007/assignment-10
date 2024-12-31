@@ -6,7 +6,7 @@ import os
 from urllib.parse import urlparse
 
 class HotelsSpider(scrapy.Spider):
-    name = "hotels_combined"
+    name = "hotels"
 
     start_urls = [
         'https://uk.trip.com/hotels/?locale=en-GB&curr=GBP'
