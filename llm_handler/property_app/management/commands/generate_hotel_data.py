@@ -74,4 +74,4 @@ class Command(BaseCommand):
             )
 
             self.stdout.write(self.style.SUCCESS(f"Processed hotel {hotel.id}: Title, Summary, Rating, Review"))
-            break
+            # break

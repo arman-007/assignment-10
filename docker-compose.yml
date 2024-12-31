@@ -24,7 +24,7 @@ services:
       # args:
       #   SERVICE: "scrapy crawl hotels_combined"
     # command: ["sleep", "infinity"]
-    command: ["scrapy", "crawl", "hotels_combined"]
+    command: ["scrapy", "crawl", "hotels"]
     container_name: scraper
     depends_on:
       db:
