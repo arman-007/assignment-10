@@ -1,17 +1,15 @@
 from django.db import connection
 from unittest.mock import patch, MagicMock
 from django.core.management import call_command
-from django.test import TestCase
+from django.test import TransactionTestCase
 from property_app.models import GeneratedTitle, HotelSummary, HotelRating
 
-class TestGenerateHotelDataCommand(TestCase):
-    def setUp(self):
-        """
-        Create the `hotels` table in the test database using raw SQL.
-        Insert mock data into the `hotels` table.
-        """
+class TestGenerateHotelDataCommand(TransactionTestCase):
+    @classmethod
+    def setUpClass(cls):
+        super().setUpClass()
+        # Create the `hotels` table
         with connection.cursor() as cursor:
-            # Create the `hotels` table
             cursor.execute("""
                 CREATE TABLE IF NOT EXISTS hotels (
                     id SERIAL PRIMARY KEY,
@@ -28,7 +26,17 @@ class TestGenerateHotelDataCommand(TestCase):
                 )
             """)
 
-            # Insert mock data
+    @classmethod
+    def tearDownClass(cls):
+        with connection.cursor() as cursor:
+            cursor.execute("DROP TABLE IF EXISTS hotels")
+        super().tearDownClass()
+
+
+    def setUp(self):
+        # Insert mock data
+        with connection.cursor() as cursor:
+            cursor.execute("DELETE FROM hotels")  # Clear any existing data
             cursor.execute("""
                 INSERT INTO hotels (property_title, rating, location, latitude, longitude, room_type, price, city_name)
                 VALUES
@@ -37,9 +45,6 @@ class TestGenerateHotelDataCommand(TestCase):
 
     @patch("property_app.management.commands.generate_hotel_data.call_ollama")
     def test_generate_hotel_data_success(self, mock_call_ollama):
-        """
-        Test the `generate_hotel_data` command with raw SQL setup.
-        """
         # Mock the call_ollama function to return a valid response
         mock_call_ollama.return_value = (
             "Title: Generated Test Hotel\n"
@@ -58,9 +63,6 @@ class TestGenerateHotelDataCommand(TestCase):
 
     @patch("property_app.management.commands.generate_hotel_data.call_ollama")
     def test_generate_hotel_data_parsing_failure(self, mock_call_ollama):
-        """
-        Test the `generate_hotel_data` command when the API response cannot be parsed.
-        """
         # Mock the call_ollama function to return an invalid response
         mock_call_ollama.return_value = "Invalid Response Format"
 
