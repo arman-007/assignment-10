@@ -1,2 +1,4 @@
 # ollama model run:
 ollama run llama3.2:1b
+
+pip install pytest pytest-django pytest-cov pytest-mock responses
