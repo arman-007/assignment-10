@@ -17,6 +17,8 @@ class HotelsSpider(scrapy.Spider):
         Step 1: Extract all locations and select 3 random ones.
         """
         self.logger.info("Fetching all locations...")
+        print("Scraping service has started.")
+
 
         # Extract the JavaScript variable using a regex
         script_data = re.search(r'window\.IBU_HOTEL\s*=\s*({.*?});', response.text)
@@ -29,9 +31,9 @@ class HotelsSpider(scrapy.Spider):
             selected_cities = random.sample(all_cities, 3)
             self.logger.info(f"Selected cities: {[city['name'] for city in selected_cities]}")
 
+            print("Selecting 3 random locations citites.")
             for city in selected_cities:
                 location_id = city.get("id")
-                print(location_id)
                 url = f"https://uk.trip.com/hotels/list?city={location_id}"
                 yield scrapy.Request(
                     url=url,
@@ -47,6 +49,7 @@ class HotelsSpider(scrapy.Spider):
         """
         city_name = response.meta.get("city_name", "Unknown City")
         self.logger.info(f"Scraping hotels for location: {city_name}")
+        print(f"Scraping hotels for location: {city_name}")
 
         # Extract JSON hotel data from page source
         script_data = re.search(r'window\.IBU_HOTEL\s*=\s*({.*?});', response.text)
