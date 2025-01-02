@@ -1,2 +1,0 @@
-# ollama model run:
-ollama run llama3.2:1b

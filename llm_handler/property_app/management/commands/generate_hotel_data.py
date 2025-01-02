@@ -34,11 +34,7 @@ class Command(BaseCommand):
             """
             
             # Call Ollama API
-            # print(prompt)
-            # break
             response = call_ollama(prompt)
-            # print(f"Response from Ollama: {response}")
-            # break
             
             # Parse response
             try:
@@ -47,10 +43,6 @@ class Command(BaseCommand):
                 summary = next(line.split(":")[1].strip() for line in lines if line.startswith("Summary:"))
                 rating = next(line.split(":")[1].strip() for line in lines if line.startswith("Rating:"))
                 review = next(line.split(":")[1].strip() for line in lines if line.startswith("Review:"))
-            # for line in lines:
-            #     print(line)
-            #     print(".,.,.,.,.,.,.,.,.,.,.")
-            # print(len(lines))
             except (ValueError, StopIteration, IndexError) as e:
                 self.stdout.write(self.style.ERROR(f"Failed to parse response for hotel {hotel.id}: {response}"))
                 continue
@@ -74,4 +66,3 @@ class Command(BaseCommand):
             )
 
             self.stdout.write(self.style.SUCCESS(f"Processed hotel {hotel.id}: Title, Summary, Rating, Review"))
-            # break
