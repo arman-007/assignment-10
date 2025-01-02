@@ -1,5 +1,6 @@
 from django.db import models
 
+
 class Hotel(models.Model):
     id = models.BigAutoField(primary_key=True)  # Match the `id` column type
     property_title = models.TextField()
@@ -10,12 +11,10 @@ class Hotel(models.Model):
     room_type = models.TextField()
     price = models.FloatField()
     city_name = models.TextField()
-    image_url = models.TextField()
-    image_path = models.TextField()
 
     class Meta:
         db_table = 'hotels'  # Use the existing table name
-        managed = False      # Prevent Django from managing this table
+        managed = True       # Allow Django to manage this table
 
 
 class GeneratedTitle(models.Model):

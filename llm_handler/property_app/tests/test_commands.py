@@ -26,11 +26,11 @@ class TestGenerateHotelDataCommand(TransactionTestCase):
                 )
             """)
 
-    @classmethod
-    def tearDownClass(cls):
-        with connection.cursor() as cursor:
-            cursor.execute("DROP TABLE IF EXISTS hotels")
-        super().tearDownClass()
+    # @classmethod
+    # def tearDownClass(cls):
+    #     with connection.cursor() as cursor:
+    #         cursor.execute("DROP TABLE IF EXISTS hotels")
+    #     super().tearDownClass()
 
 
     def setUp(self):
@@ -63,15 +63,29 @@ class TestGenerateHotelDataCommand(TransactionTestCase):
 
     @patch("property_app.management.commands.generate_hotel_data.call_ollama")
     def test_generate_hotel_data_parsing_failure(self, mock_call_ollama):
+        """
+        Test the `generate_hotel_data` command when the API response cannot be parsed.
+        """
         # Mock the call_ollama function to return an invalid response
         mock_call_ollama.return_value = "Invalid Response Format"
 
+        # Reset the table and insert a mock Hotel instance
+        with connection.cursor() as cursor:
+            cursor.execute("TRUNCATE TABLE hotels RESTART IDENTITY CASCADE;")
+            cursor.execute("""
+                INSERT INTO hotels (property_title, rating, location, latitude, longitude, room_type, price, city_name)
+                VALUES ('Test Hotel', 4.5, 'Test Location', 45.0, -93.0, 'Deluxe', 200.0, 'Test City')
+                RETURNING id
+            """)
+            hotel_id = cursor.fetchone()[0]  # Fetch the auto-generated hotel ID
+
         # Run the command
-        with self.assertLogs(level="ERROR") as log:
+        with self.assertLogs("property_app.management.commands.generate_hotel_data", level="ERROR") as log:
             call_command("generate_hotel_data")
 
         # Assert error log
-        self.assertIn("Failed to parse response for hotel", log.output[0])
+        expected_message = f"Failed to parse response for hotel {hotel_id}: Invalid Response Format"
+        self.assertIn(expected_message, log.output[0])
 
         # Ensure no data was saved to the database
         self.assertFalse(GeneratedTitle.objects.exists())

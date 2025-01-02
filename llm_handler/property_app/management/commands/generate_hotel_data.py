@@ -1,6 +1,10 @@
+import logging
 from django.core.management.base import BaseCommand
 from property_app.models import Hotel, GeneratedTitle, HotelSummary, HotelRating
 from property_app.services.ollama_service import call_ollama
+
+
+logger = logging.getLogger(__name__)
 
 class Command(BaseCommand):
     help = "Generate rewritten titles, summaries, ratings, and reviews for hotels."
@@ -44,7 +48,7 @@ class Command(BaseCommand):
                 rating = next(line.split(":")[1].strip() for line in lines if line.startswith("Rating:"))
                 review = next(line.split(":")[1].strip() for line in lines if line.startswith("Review:"))
             except (ValueError, StopIteration, IndexError) as e:
-                self.stdout.write(self.style.ERROR(f"Failed to parse response for hotel {hotel.id}: {response}"))
+                logger.error(f"Failed to parse response for hotel {hotel.id}: {response}")
                 continue
             
             # Save to GeneratedTitle table
